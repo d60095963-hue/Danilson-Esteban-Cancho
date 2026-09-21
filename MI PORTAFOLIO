@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portafolio Digital Universitario - UPLA</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        darkbg: '#0a0a0c',
+                        darkcard: '#121318',
+                        darkborder: '#1f222e',
+                        celeste: {
+                            DEFAULT: '#00b4d8',
+                            light: '#48cae4',
+                            glow: '#00b4d880'
+                        },
+                        verde: {
+                            DEFAULT: '#2ec4b6',
+                            bright: '#00f5d4',
+                            glow: '#00f5d460'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        code: ['Fira Code', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Glowing & Cyberpunk Effects */
+        body {
+            background-color: #0a0a0c;
+            color: #f1f5f9;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(0, 180, 216, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(0, 245, 212, 0.08) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+
+        .glass-card {
+            background: rgba(18, 19, 24, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 180, 216, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(0, 245, 212, 0.4);
+            box-shadow: 0 0 15px rgba(0, 245, 212, 0.15);
+        }
+
+        .glow-border-celeste {
+            box-shadow: 0 0 10px rgba(0, 180, 216, 0.3);
+        }
+
+        .glow-text-celeste {
+            text-shadow: 0 0 8px rgba(0, 180, 216, 0.6);
+        }
+
+        .glow-text-verde {
+            text-shadow: 0 0 8px rgba(0, 245, 212, 0.6);
+        }
+
+        .btn-gradient {
+            background: linear-gradient(135deg, #00b4d8 0%, #2ec4b6 100%);
+            transition: all 0.3s ease;
+        }
+
+        .btn-gradient:hover {
+            background: linear-gradient(135deg, #48cae4 0%, #00f5d4 100%);
+            box-shadow: 0 0 15px rgba(0, 245, 212, 0.4);
+            transform: translateY(-1px);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0a0c;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1f222e;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00b4d8;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased min-h-screen flex flex-col justify-between selection:bg-verde selection:text-black">
+
+    <!-- AUTHENTICATION CONTAINER -->
+    <div id="authContainer" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-darkbg/90 backdrop-blur-md">
+        <div class="w-full max-w-md glass-card rounded-2xl p-6 md:p-8 border border-celeste/30 relative overflow-hidden shadow-2xl">
+            <!-- Decorative Accent line -->
+            <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-celeste via-verde-bright to-celeste"></div>
+
+            <!-- Logo Header -->
+            <div class="text-center mb-6">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-darkbg border-2 border-celeste mb-3 shadow-[0_0_15px_rgba(0,180,216,0.3)]">
+                    <i class="fa-solid fa-graduation-cap text-3xl text-verde-bright"></i>
+                </div>
+                <h2 class="text-xl font-extrabold tracking-tight text-white uppercase">Universidad Peruana</h2>
+                <h3 class="text-lg font-bold text-celeste tracking-widest uppercase glow-text-celeste">Los Andes</h3>
+                <p class="text-xs text-gray-400 mt-1">Portafolio Digital Académico</p>
+            </div>
+
+            <!-- Auth Tabs -->
+            <div class="flex border-b border-darkborder mb-6">
+                <button id="tabLoginBtn" onclick="switchAuthTab('login')" class="flex-1 py-2 text-sm font-semibold text-celeste border-b-2 border-celeste transition-all duration-300">
+                    <i class="fa-solid fa-right-to-bracket mr-2"></i>Iniciar Sesión
+                </button>
+                <button id="tabRegisterBtn" onclick="switchAuthTab('register')" class="flex-1 py-2 text-sm font-semibold text-gray-400 hover:text-white transition-all duration-300">
+                    <i class="fa-solid fa-user-plus mr-2"></i>Registrarse
+                </button>
+            </div>
+
+            <!-- Alert Box -->
+            <div id="authAlert" class="hidden mb-4 p-3 rounded-lg text-xs font-medium bg-red-500/20 text-red-300 border border-red-500/30"></div>
+
+            <!-- LOGIN FORM -->
+            <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-gray-300 mb-1">Nombre o Código Universitario</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                            <i class="fa-solid fa-id-card text-sm"></i>
+                        </span>
+                        <input type="text" id="loginIdentifier" required placeholder="Ej: U12345678 o Tu Nombre" class="w-full pl-10 pr-4 py-2.5 bg-darkbg/80 border border-darkborder rounded-xl text-sm focus:outline-none focus:border-celeste text-white placeholder-gray-500 transition-colors">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-300 mb-1">Contraseña</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                            <i class="fa-solid fa-lock text-sm"></i>
+                        </span>
+                        <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full pl-10 pr-4 py-2.5 bg-darkbg/80 border border-darkborder rounded-xl text-sm focus:outline-none focus:border-celeste text-white placeholder-gray-500 transition-colors">
+                    </div>
+                </div>
+                <button type="submit" class="w-full py-3 mt-2 btn-gradient text-darkbg font-bold rounded-xl text-sm flex items-center justify-center space-x-2 shadow-lg">
+                    <span>Ingresar al Portafolio</span>
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+            </form>
+
+            <!-- REGISTER FORM -->
+            <form id="registerForm" onsubmit="handleRegister(event)" class="space-y-3 hidden">
+                <div>
+                    <label class="block text-xs font-medium text-gray-300 mb-1">Nombre Completo</label>
+                    <input type="text" id="regName" required placeholder="Ej: Juan Pérez" class="w-full px-3 py-2 bg-darkbg/80 border border-darkborder rounded-xl text-xs focus:outline-none focus:border-verde-bright text-white placeholder-gray-500">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-300 mb-1">Código Estudiante</label>
+                        <input type="text" id="regCode" required placeholder="Ej: 74839201" class="w-full px-3 py-2 bg-darkbg/80 border border-darkborder rounded-xl text-xs focus:outline-none focus:border-verde-bright text-white placeholder-gray-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-300 mb-1">Ciclo Académico</label>
+                        <select id="regCycle" required class="w-full px-3 py-2 bg-darkbg/80 border border-darkborder rounded-xl text-xs focus:outline-none focus:border-verde-bright text-white">
+                            <option value="I Ciclo">I Ciclo</option>
+                            <option value="II Ciclo">II Ciclo</option>
+                            <option value="III Ciclo">III Ciclo</option>
+                            <option value="IV Ciclo">IV Ciclo</option>
+                            <option value="V Ciclo" selected>V Ciclo</option>
+                            <option value="VI Ciclo">VI Ciclo</option>
+                            <option value="VII Ciclo">VII Ciclo</option>
+                            <option value="VIII Ciclo">VIII Ciclo</option>
+                            <option value="IX Ciclo">IX Ciclo</option>
+                            <option value="X Ciclo">X Ciclo</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-300 mb-1">Carrera Universitaria</label>
+                    <input type="text" id="regCareer" required placeholder="Ej: Ingeniería de Sistemas e Informática" class="w-full px-3 py-2 bg-darkbg/80 border border-darkborder rounded-xl text-xs focus:outline-none focus:border-verde-bright text-white placeholder-gray-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-300 mb-1">Contraseña</label>
+                    <input type="password" id="regPassword" required placeholder="Crea una contraseña segura" class="w-full px-3 py-2 bg-darkbg/80 border border-darkborder rounded-xl text-xs focus:outline-none focus:border-verde-bright text-white placeholder-gray-500">
+                </div>
+                <button type="submit" class="w-full py-3 mt-2 btn-gradient text-darkbg font-bold rounded-xl text-sm flex items-center justify-center space-x-2 shadow-lg">
+                    <i class="fa-solid fa-user-check text-xs"></i>
+                    <span>Crear Cuenta Mi UPLA</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MAIN DASHBOARD -->
+    <div id="appContainer" class="hidden min-h-screen flex flex-col">
+        <!-- HEADER / NAVIGATION -->
+        <header class="glass-card sticky top-0 z-40 border-b border-celeste/20 bg-darkbg/90">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+                <!-- Brand & Logo -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-celeste to-verde-bright p-0.5 shadow-[0_0_10px_rgba(0,180,216,0.5)]">
+                        <div class="w-full h-full bg-darkbg rounded-[10px] flex items-center justify-center">
+                            <i class="fa-solid fa-university text-verde-bright text-lg"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="font-black text-white text-base tracking-wide">UPLA</span>
+                            <span class="text-xs px-2 py-0.5 rounded bg-celeste/20 text-celeste font-semibold border border-celeste/30">Portafolio</span>
+                        </div>
+                        <p class="text-[11px] text-gray-400 font-medium hidden sm:block">Universidad Peruana Los Andes</p>
+                    </div>
+                </div>
+
+                <!-- User Info Badge -->
+                <div class="flex items-center space-x-4">
+                    <div class="text-right hidden md:block">
+                        <div id="userDisplayName" class="text-sm font-bold text-white flex items-center justify-end space-x-1">
+                            <span>Cargando...</span>
+                        </div>
+                        <div id="userDisplayDetails" class="text-xs text-verde-bright font-mono">
+                            ---
+                        </div>
+                    </div>
+
+                    <button onclick="logout()" class="p-2.5 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/30 transition-all text-xs font-semibold flex items-center space-x-2" title="Cerrar Sesión">
+                        <i class="fa-solid fa-power-off text-sm"></i>
+                        <span class="hidden sm:inline">Salir</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN BODY CONTENT -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
+            
+            <!-- Welcome Banner -->
+            <div class="relative overflow-hidden rounded-2xl glass-card p-6 md:p-8 mb-8 border border-celeste/30">
+                <div class="absolute -right-10 -bottom-10 w-60 h-60 bg-verde/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <span class="text-xs font-bold text-verde-bright uppercase tracking-widest px-2.5 py-1 rounded-full bg-verde/10 border border-verde/20">
+                            Semestre Académico Activo
+                        </span>
+                        <h1 class="text-2xl md:text-3xl font-extrabold text-white mt-2">
+                            Portafolio de Trabajos y Evidencias
+                        </h1>
+                        <p class="text-sm text-gray-400 mt-1 max-w-2xl">
+                            Gestiona, organiza y suba tus actividades universitarias organizadas por unidades en las asignaturas de tu especialidad.
+                        </p>
+                    </div>
+                    <button onclick="openUploadModal()" class="btn-gradient text-darkbg font-extrabold px-5 py-3 rounded-xl text-sm flex items-center justify-center space-x-2 shadow-lg hover:scale-105 transition-transform self-start md:self-auto">
+                        <i class="fa-solid fa-cloud-arrow-up text-base"></i>
+                        <span>Subir Trabajo</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Course Selection Tabs -->
+            <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 mb-6">
+                <button id="courseTab1" onclick="selectCourse('dev-apps')" class="flex-1 p-4 rounded-xl glass-card border-l-4 border-l-celeste text-left transition-all flex items-center justify-between group">
+                    <div class="flex items-center space-x-3">
+                        <div class="p-3 rounded-lg bg-celeste/10 text-celeste group-hover:bg-celeste group-hover:text-darkbg transition-colors">
+                            <i class="fa-solid fa-laptop-code text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-white text-sm sm:text-base">Desarrollo de Aplicaciones</h3>
+                            <p class="text-xs text-gray-400">Asignatura Principal</p>
+                        </div>
+                    </div>
+                    <span id="badgeDevApps" class="px-2.5 py-1 text-xs rounded-full bg-darkbg border border-celeste/30 text-celeste font-mono font-bold">0</span>
+                </button>
+
+                <button id="courseTab2" onclick="selectCourse('algo-struct')" class="flex-1 p-4 rounded-xl glass-card border-l-4 border-l-gray-600 text-left transition-all flex items-center justify-between group opacity-70 hover:opacity-100">
+                    <div class="flex items-center space-x-3">
+                        <div class="p-3 rounded-lg bg-verde/10 text-verde-bright group-hover:bg-verde-bright group-hover:text-darkbg transition-colors">
+                            <i class="fa-solid fa-diagram-project text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-white text-sm sm:text-base">Algoritmos y Estructuras</h3>
+                            <p class="text-xs text-gray-400">Asignatura Especializada</p>
+                        </div>
+                    </div>
+                    <span id="badgeAlgoStruct" class="px-2.5 py-1 text-xs rounded-full bg-darkbg border border-verde/30 text-verde-bright font-mono font-bold">0</span>
+                </button>
+            </div>
+
+            <!-- Units Navigation Filter -->
+            <div class="glass-card rounded-xl p-2 mb-8 flex flex-wrap gap-1 md:gap-2">
+                <button onclick="selectUnit('all')" id="unitTab-all" class="unit-btn flex-1 min-w-[90px] py-2.5 px-3 rounded-lg text-xs font-bold text-white bg-celeste/20 border border-celeste/40 transition-all text-center">
+                    Todas
+                </button>
+                <button onclick="selectUnit('U1')" id="unitTab-U1" class="unit-btn flex-1 min-w-[90px] py-2.5 px-3 rounded-lg text-xs font-semibold text-gray-400 hover:text-white transition-all text-center">
+                    Unidad 1
+                </button>
+                <button onclick="selectUnit('U2')" id="unitTab-U2" class="unit-btn flex-1 min-w-[90px] py-2.5 px-3 rounded-lg text-xs font-semibold text-gray-400 hover:text-white transition-all text-center">
+                    Unidad 2
+                </button>
+                <button onclick="selectUnit('U3')" id="unitTab-U3" class="unit-btn flex-1 min-w-[90px] py-2.5 px-3 rounded-lg text-xs font-semibold text-gray-400 hover:text-white transition-all text-center">
+                    Unidad 3
+                </button>
+                <button onclick="selectUnit('U4')" id="unitTab-U4" class="unit-btn flex-1 min-w-[90px] py-2.5 px-3 rounded-lg text-xs font-semibold text-gray-400 hover:text-white transition-all text-center">
+                    Unidad 4
+                </button>
+            </div>
+
+            <!-- WORKS CONTENT GRID -->
+            <div id="worksGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Works Cards will be dynamically rendered here -->
+            </div>
+
+            <!-- Empty State Display -->
+            <div id="emptyState" class="hidden flex-col items-center justify-center py-16 text-center glass-card rounded-2xl border border-dashed border-darkborder">
+                <div class="w-16 h-16 rounded-full bg-darkbg flex items-center justify-center mb-4 text-celeste text-2xl border border-celeste/20">
+                    <i class="fa-solid fa-folder-open"></i>
+                </div>
+                <h3 class="text-base font-bold text-white">No hay trabajos registrados</h3>
+                <p class="text-xs text-gray-400 mt-1 max-w-sm">No se encontraron entregas en este curso o unidad seleccionada. ¡Haz clic en subir trabajo para añadir una!</p>
+                <button onclick="openUploadModal()" class="mt-4 px-4 py-2 bg-celeste/20 text-celeste border border-celeste/40 hover:bg-celeste/30 rounded-xl text-xs font-bold transition-all">
+                    + Registrar Trabajo
+                </button>
+            </div>
+
+        </main>
+
+        <!-- FOOTER -->
+        <footer class="border-t border-darkborder bg-darkbg py-6 mt-12 text-center text-xs text-gray-500">
+            <div class="max-w-7xl mx-auto px-4">
+                <p>© Universidad Peruana Los Andes - Portafolio Digital Universitario</p>
+                <p class="text-[11px] text-gray-600 mt-1">Sistemas & Informática • Desarrollado para gestión de evidencias académicas</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- UPLOAD WORK MODAL -->
+    <div id="uploadModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-darkbg/80 backdrop-blur-md">
+        <div class="w-full max-w-xl glass-card rounded-2xl p-6 border border-verde-bright/30 relative max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-5 pb-3 border-b border-darkborder">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-cloud-arrow-up text-verde-bright text-lg"></i>
+                    <h3 class="text-base font-bold text-white">Subir Trabajo Académico</h3>
+                </div>
+                <button onclick="closeUploadModal()" class="text-gray-400 hover:text-white p-1 text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form id="workForm" onsubmit="saveWork(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-gray-300 mb-1">Título del Trabajo / Actividad</label>
+                    <input type="text" id="workTitle" required placeholder="Ej: Guía Práctica 01 - Matriz de Adyacencia" class="w-full px-3 py-2 bg-darkbg border border-darkborder rounded-xl text-xs text-white focus:outline-none focus:border-verde-bright">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-300 mb-1">Curso Destino</label>
+                        <select id="workCourse" required class="w-full px-3 py-2 bg-darkbg border border-darkborder rounded-xl text-xs text-white focus:outline-none focus:border-verde-bright">
+                            <option value="dev-apps">Desarrollo de Aplicaciones</option>
+                            <option value="algo-struct">Algoritmos y Estructuras</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-300 mb-1">Unidad Académica</label>
+                        <select id="workUnit" required class="w-full px-3 py-2 bg-darkbg border border-darkborder rounded-xl text-xs text-white focus:outline-none focus:border-verde-bright">
+                            <option value="U1">Unidad 1</option>
+                            <option value="U2">Unidad 2</option>
+                            <option value="U3">Unidad 3</option>
+                            <option value="U4">Unidad 4</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-gray-300 mb-1">Tipo de Documento</label>
+                    <select id="workType" onchange="toggleTypeInput()" required class="w-full px-3 py-2 bg-darkbg border border-darkborder rounded-xl text-xs text-white focus:outline-none focus:border-verde-bright">
+                        <option value="java">Código Java (.java)</option>
+                        <option value="pdf">Documento PDF (.pdf)</option>
+                        <option value="word">Documento Word (.docx)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-gray-300 mb-1">Descripción corta</label>
+                    <textarea id="workDescription" rows="2" placeholder="Resumen o explicación de la actividad solicitada por el docente..." class="w-full px-3 py-2 bg-darkbg border border-darkborder rounded-xl text-xs text-white focus:outline-none focus:border-verde-bright resize-none"></textarea>
+                </div>
+
+                <!-- Link/Url input for PDF or WORD -->
+                <div id="linkContainer" class="hidden">
+                    <label class="block text-xs font-medium text-gray-300 mb-1">Enlace del Archivo (Google Drive / GitHub / OneDrive)</label>
+                    <input type="url" id="workUrl" placeholder="https://drive.google.com/..." class="w-full px-3 py-2 bg-darkbg border border-darkborder rounded-xl text-xs text-white focus:outline-none focus:border-verde-bright">
+                </div>
+
+                <!-- Code Editor area for Java -->
+                <div id="codeContainer">
+                    <label class="block text-xs font-medium text-gray-300 mb-1">Código Fuente Java</label>
+                    <textarea id="workCode" rows="6" placeholder="public class Principal {&#10;    public static void main(String[] args) {&#10;        System.out.println(&quot;Hola UPLA&quot;);&#10;    }&#10;}" class="w-full px-3 py-2 bg-darkbg font-code text-xs border border-darkborder rounded-xl text-verde-bright focus:outline-none focus:border-verde-bright resize-none"></textarea>
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-3 border-t border-darkborder">
+                    <button type="button" onclick="closeUploadModal()" class="px-4 py-2 rounded-xl text-xs text-gray-400 hover:text-white transition-colors">Cancelar</button>
+                    <button type="submit" class="btn-gradient text-darkbg font-bold px-5 py-2 rounded-xl text-xs shadow-lg">Guardar Trabajo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- CODE VIEW / DETAILS MODAL -->
+    <div id="viewModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-darkbg/85 backdrop-blur-md">
+        <div class="w-full max-w-2xl glass-card rounded-2xl p-6 border border-celeste/30 relative max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-start mb-4 pb-3 border-b border-darkborder">
+                <div>
+                    <span id="viewUnitTag" class="px-2 py-0.5 text-[10px] rounded font-bold uppercase bg-celeste/20 text-celeste">U1</span>
+                    <h3 id="viewTitle" class="text-base font-bold text-white mt-1">Título del Trabajo</h3>
+                    <p id="viewCourse" class="text-xs text-gray-400">Curso</p>
+                </div>
+                <button onclick="closeViewModal()" class="text-gray-400 hover:text-white p-1 text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto space-y-4">
+                <div>
+                    <h4 class="text-xs font-semibold text-gray-300 mb-1">Descripción:</h4>
+                    <p id="viewDescription" class="text-xs text-gray-400 bg-darkbg p-3 rounded-xl border border-darkborder">Sin descripción</p>
+                </div>
+
+                <div id="viewCodeBlock" class="hidden">
+                    <h4 class="text-xs font-semibold text-verde-bright mb-1 flex items-center justify-between">
+                        <span>Código Java</span>
+                        <button onclick="copyCode()" class="text-[10px] text-gray-400 hover:text-white bg-darkbg px-2 py-1 rounded border border-darkborder">
+                            <i class="fa-solid fa-copy mr-1"></i>Copiar
+                        </button>
+                    </h4>
+                    <pre class="bg-darkbg p-4 rounded-xl border border-darkborder font-code text-xs text-verde-bright overflow-x-auto max-h-60"><code id="viewCodeContent"></code></pre>
+                </div>
+
+                <div id="viewLinkBlock" class="hidden text-center py-4">
+                    <a id="viewLinkBtn" href="#" target="_blank" class="inline-flex items-center space-x-2 px-5 py-2.5 bg-celeste/20 text-celeste border border-celeste/40 hover:bg-celeste/30 rounded-xl text-xs font-bold transition-all">
+                        <i class="fa-solid fa-external-link"></i>
+                        <span>Abrir Documento Adjunto</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // GLOBAL APP STATE
+        let currentUser = null;
+        let selectedCourse = 'dev-apps';
+        let selectedUnit = 'all';
+        let works = [];
+
+        // INITIALIZATION
+        window.onload = function() {
+            // Check if user is already stored in local persistence
+            const savedUser = localStorage.getItem('upla_current_user');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                showDashboard();
+            } else {
+                showAuth();
+            }
+        };
+
+        // AUTHENTICATION FUNCTIONS
+        function switchAuthTab(tab) {
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const tabLoginBtn = document.getElementById('tabLoginBtn');
+            const tabRegisterBtn = document.getElementById('tabRegisterBtn');
+            const authAlert = document.getElementById('authAlert');
+
+            authAlert.classList.add('hidden');
+
+            if (tab === 'login') {
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+                tabLoginBtn.className = 'flex-1 py-2 text-sm font-semibold text-celeste border-b-2 border-celeste transition-all duration-300';
+                tabRegisterBtn.className = 'flex-1 py-2 text-sm font-semibold text-gray-400 hover:text-white transition-all duration-300';
+            } else {
+                registerForm.classList.remove('hidden');
+                loginForm.classList.add('hidden');
+                tabRegisterBtn.className = 'flex-1 py-2 text-sm font-semibold text-verde-bright border-b-2 border-verde-bright transition-all duration-300';
+                tabLoginBtn.className = 'flex-1 py-2 text-sm font-semibold text-gray-400 hover:text-white transition-all duration-300';
+            }
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById('regName').value.trim();
+            const code = document.getElementById('regCode').value.trim();
+            const cycle = document.getElementById('regCycle').value;
+            const career = document.getElementById('regCareer').value.trim();
+            const password = document.getElementById('regPassword').value;
+
+            let users = JSON.parse(localStorage.getItem('upla_registered_users') || '[]');
+
+            // Check if user code or name exists
+            if (users.some(u => u.code === code)) {
+                showAuthAlert('El código de estudiante ya se encuentra registrado.');
+                return;
+            }
+
+            const newUser = { name, code, cycle, career, password };
+            users.push(newUser);
+            localStorage.setItem('upla_registered_users', JSON.stringify(users));
+
+            // Log in newly registered user
+            currentUser = newUser;
+            localStorage.setItem('upla_current_user', JSON.stringify(currentUser));
+            showDashboard();
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const identifier = document.getElementById('loginIdentifier').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            let users = JSON.parse(localStorage.getItem('upla_registered_users') || '[]');
+
+            // Default account fallback for quick test if no user registered
+            if (users.length === 0 && (identifier === 'admin' || identifier === 'U12345678')) {
+                const defaultUser = {
+                    name: 'Estudiante Demo UPLA',
+                    code: 'U12345678',
+                    cycle: 'V Ciclo',
+                    career: 'Ingeniería de Sistemas',
+                    password: password
+                };
+                currentUser = defaultUser;
+                localStorage.setItem('upla_current_user', JSON.stringify(currentUser));
+                showDashboard();
+                return;
+            }
+
+            const foundUser = users.find(u => (u.code === identifier || u.name.toLowerCase() === identifier.toLowerCase()) && u.password === password);
+
+            if (foundUser) {
+                currentUser = foundUser;
+                localStorage.setItem('upla_current_user', JSON.stringify(currentUser));
+                showDashboard();
+            } else {
+                showAuthAlert('Credenciales incorrectas. Verifica tu código/nombre y contraseña.');
+            }
+        }
+
+        function showAuthAlert(msg) {
+            const authAlert = document.getElementById('authAlert');
+            authAlert.innerText = msg;
+            authAlert.classList.remove('hidden');
+        }
+
+        function logout() {
+            localStorage.removeItem('upla_current_user');
+            currentUser = null;
+            document.getElementById('appContainer').classList.add('hidden');
+            document.getElementById('authContainer').classList.remove('hidden');
+        }
+
+        function showAuth() {
+            document.getElementById('authContainer').classList.remove('hidden');
+            document.getElementById('appContainer').classList.add('hidden');
+        }
+
+        function showDashboard() {
+            document.getElementById('authContainer').classList.add('hidden');
+            document.getElementById('appContainer').classList.remove('hidden');
+
+            // Render Header User Info
+            document.getElementById('userDisplayName').innerHTML = `<i class="fa-solid fa-user-graduate text-celeste mr-1.5"></i> ${currentUser.name}`;
+            document.getElementById('userDisplayDetails').innerText = `${currentUser.code} • ${currentUser.career} (${currentUser.cycle})`;
+
+            // Load works from storage
+            loadWorks();
+            renderWorks();
+        }
+
+        // WORKS DATA MANAGEMENT
+        function loadWorks() {
+            const storageKey = `upla_works_${currentUser.code}`;
+            const stored = localStorage.getItem(storageKey);
+            if (stored) {
+                works = JSON.parse(stored);
+            } else {
+                // Initial Sample Works for showcase
+                works = [
+                    {
+                        id: '1',
+                        title: 'Guía Práctica N°1: Arreglos y Matrices',
+                        course: 'algo-struct',
+                        unit: 'U1',
+                        type: 'java',
+                        description: 'Implementación de algoritmos de ordenamiento rápido (QuickSort) e inserción en Java.',
+                        code: 'public class QuickSort {\n    public static void main(String[] args) {\n        int[] arr = {10, 7, 8, 9, 1, 5};\n        System.out.println("Arreglo procesado UPLA");\n    }\n}',
+                        date: '2026-03-10'
+                    },
+                    {
+                        id: '2',
+                        title: 'Informe de Arquitectura MVC en Web',
+                        course: 'dev-apps',
+                        unit: 'U1',
+                        type: 'pdf',
+                        description: 'Análisis de patrones de diseño frontend y backend para la plataforma universitaria.',
+                        url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+                        date: '2026-03-15'
+                    }
+                ];
+                saveWorksToStorage();
+            }
+        }
+
+        function saveWorksToStorage() {
+            const storageKey = `upla_works_${currentUser.code}`;
+            localStorage.setItem(storageKey, JSON.stringify(works));
+            updateBadges();
+        }
+
+        function updateBadges() {
+            const devAppsCount = works.filter(w => w.course === 'dev-apps').length;
+            const algoStructCount = works.filter(w => w.course === 'algo-struct').length;
+
+            document.getElementById('badgeDevApps').innerText = devAppsCount;
+            document.getElementById('badgeAlgoStruct').innerText = algoStructCount;
+        }
+
+        // COURSE & UNIT SELECTION
+        function selectCourse(course) {
+            selectedCourse = course;
+            
+            const tab1 = document.getElementById('courseTab1');
+            const tab2 = document.getElementById('courseTab2');
+
+            if (course === 'dev-apps') {
+                tab1.className = 'flex-1 p-4 rounded-xl glass-card border-l-4 border-l-celeste text-left transition-all flex items-center justify-between group opacity-100';
+                tab2.className = 'flex-1 p-4 rounded-xl glass-card border-l-4 border-l-gray-600 text-left transition-all flex items-center justify-between group opacity-70 hover:opacity-100';
+            } else {
+                tab2.className = 'flex-1 p-4 rounded-xl glass-card border-l-4 border-l-verde-bright text-left transition-all flex items-center justify-between group opacity-100';
+                tab1.className = 'flex-1 p-4 rounded-xl glass-card border-l-4 border-l-gray-600 text-left transition-all flex items-center justify-between group opacity-70 hover:opacity-100';
+            }
+
+            renderWorks();
+        }
+
+        function selectUnit(unit) {
+            selectedUnit = unit;
+            const unitTabs = ['all', 'U1', 'U2', 'U3', 'U4'];
+
+            unitTabs.forEach(u => {
+                const btn = document.getElementById(`unitTab-${u}`);
+                if (u === unit) {
+                    btn.className = 'unit-btn flex-1 min-w-[90px] py-2.5 px-3 rounded-lg text-xs font-bold text-white bg-celeste/20 border border-celeste/40 transition-all text-center';
+                } else {
+                    btn.className = 'unit-btn flex-1 min-w-[90px] py-2.5 px-3 rounded-lg text-xs font-semibold text-gray-400 hover:text-white transition-all text-center';
+                }
+            });
+
+            renderWorks();
+        }
+
+        // RENDER WORKS
+        function renderWorks() {
+            updateBadges();
+            const grid = document.getElementById('worksGrid');
+            const emptyState = document.getElementById('emptyState');
+
+            const filteredWorks = works.filter(w => {
+                const matchCourse = w.course === selectedCourse;
+                const matchUnit = selectedUnit === 'all' || w.unit === selectedUnit;
+                return matchCourse && matchUnit;
+            });
+
+            grid.innerHTML = '';
+
+            if (filteredWorks.length === 0) {
+                emptyState.classList.remove('hidden');
+                emptyState.classList.add('flex');
+            } else {
+                emptyState.classList.add('hidden');
+                emptyState.classList.remove('flex');
+
+                filteredWorks.forEach(work => {
+                    const card = createWorkCard(work);
+                    grid.appendChild(card);
+                });
+            }
+        }
+
+        function createWorkCard(work) {
+            const card = document.createElement('div');
+            card.className = 'glass-card rounded-2xl p-5 border border-darkborder hover:border-celeste/40 transition-all flex flex-col justify-between group relative overflow-hidden';
+
+            let typeBadge = '';
+            let iconClass = '';
+
+            if (work.type === 'java') {
+                typeBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-verde/20 text-verde-bright border border-verde/30"><i class="fa-fab fa-java mr-1"></i>Java</span>';
+                iconClass = 'fa-brands fa-java text-verde-bright';
+            } else if (work.type === 'pdf') {
+                typeBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-red-500/20 text-red-400 border border-red-500/30"><i class="fa-solid fa-file-pdf mr-1"></i>PDF</span>';
+                iconClass = 'fa-solid fa-file-pdf text-red-400';
+            } else {
+                typeBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/20 text-blue-400 border border-blue-500/30"><i class="fa-solid fa-file-word mr-1"></i>Word</span>';
+                iconClass = 'fa-solid fa-file-word text-blue-400';
+            }
+
+            card.innerHTML = `
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-celeste/10 text-celeste border border-celeste/20">${work.unit}</span>
+                        ${typeBadge}
+                    </div>
+
+                    <div class="flex items-start space-x-3 mb-3">
+                        <div class="p-2.5 rounded-xl bg-darkbg border border-darkborder group-hover:border-celeste/30 transition-colors">
+                            <i class="${iconClass} text-xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-white text-sm line-clamp-2 group-hover:text-celeste-light transition-colors">${work.title}</h4>
+                            <p class="text-[11px] text-gray-500 mt-0.5"><i class="fa-regular fa-calendar mr-1"></i>${work.date || 'Reciente'}</p>
+                        </div>
+                    </div>
+
+                    <p class="text-xs text-gray-400 line-clamp-3 mb-4 font-light">
+                        ${work.description || 'Sin descripción ingresada.'}
+                    </p>
+                </div>
+
+                <div class="pt-3 border-t border-darkborder flex items-center justify-between">
+                    <button onclick="viewWorkDetails('${work.id}')" class="text-xs font-bold text-celeste hover:text-verde-bright transition-colors flex items-center space-x-1">
+                        <span>Ver Entregable</span>
+                        <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                    </button>
+                    <button onclick="deleteWork('${work.id}')" class="text-xs text-gray-500 hover:text-red-400 transition-colors p-1" title="Eliminar Trabajo">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            `;
+
+            return card;
+        }
+
+        // MODAL & FORM HANDLERS
+        function openUploadModal() {
+            document.getElementById('workCourse').value = selectedCourse;
+            document.getElementById('uploadModal').classList.remove('hidden');
+            toggleTypeInput();
+        }
+
+        function closeUploadModal() {
+            document.getElementById('uploadModal').classList.add('hidden');
+            document.getElementById('workForm').reset();
+        }
+
+        function toggleTypeInput() {
+            const type = document.getElementById('workType').value;
+            const linkContainer = document.getElementById('linkContainer');
+            const codeContainer = document.getElementById('codeContainer');
+
+            if (type === 'java') {
+                codeContainer.classList.remove('hidden');
+                linkContainer.classList.add('hidden');
+            } else {
+                codeContainer.classList.add('hidden');
+                linkContainer.classList.remove('hidden');
+            }
+        }
+
+        function saveWork(e) {
+            e.preventDefault();
+            const title = document.getElementById('workTitle').value.trim();
+            const course = document.getElementById('workCourse').value;
+            const unit = document.getElementById('workUnit').value;
+            const type = document.getElementById('workType').value;
+            const description = document.getElementById('workDescription').value.trim();
+            const url = document.getElementById('workUrl').value.trim();
+            const code = document.getElementById('workCode').value;
+
+            const newWork = {
+                id: Date.now().toString(),
+                title,
+                course,
+                unit,
+                type,
+                description,
+                url: type !== 'java' ? url : '',
+                code: type === 'java' ? code : '',
+                date: new Date().toISOString().split('T')[0]
+            };
+
+            works.unshift(newWork);
+            saveWorksToStorage();
+            closeUploadModal();
+            renderWorks();
+        }
+
+        function deleteWork(id) {
+            if (confirm('¿Estás seguro de que deseas eliminar este trabajo?')) {
+                works = works.filter(w => w.id !== id);
+                saveWorksToStorage();
+                renderWorks();
+            }
+        }
+
+        function viewWorkDetails(id) {
+            const work = works.find(w => w.id === id);
+            if (!work) return;
+
+            document.getElementById('viewTitle').innerText = work.title;
+            document.getElementById('viewCourse').innerText = work.course === 'dev-apps' ? 'Desarrollo de Aplicaciones' : 'Algoritmos y Estructuras';
+            document.getElementById('viewUnitTag').innerText = work.unit;
+            document.getElementById('viewDescription').innerText = work.description || 'Sin descripción ingresada.';
+
+            const codeBlock = document.getElementById('viewCodeBlock');
+            const linkBlock = document.getElementById('viewLinkBlock');
+
+            if (work.type === 'java') {
+                codeBlock.classList.remove('hidden');
+                linkBlock.classList.add('hidden');
+                document.getElementById('viewCodeContent').innerText = work.code || '// Sin código adjunto';
+            } else {
+                codeBlock.classList.add('hidden');
+                linkBlock.classList.remove('hidden');
+                const linkBtn = document.getElementById('viewLinkBtn');
+                linkBtn.href = work.url || '#';
+            }
+
+            document.getElementById('viewModal').classList.remove('hidden');
+        }
+
+        function closeViewModal() {
+            document.getElementById('viewModal').classList.add('hidden');
+        }
+
+        function copyCode() {
+            const codeText = document.getElementById('viewCodeContent').innerText;
+            const tempInput = document.createElement('textarea');
+            tempInput.value = codeText;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            alert('Código copiado al portapapeles');
+        }
+    </script>
+</body>
+</html>
